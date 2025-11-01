@@ -1,0 +1,66 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+      # kafka:
+      #   bootstrap-servers: localhost:9092
+      #   consumer:
+      #     group-id: api-gateway
+      #     auto-offset-reset: earliest
+      #     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      #     value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    # Remove the entire `kafka` block if the gateway doesn't consume Kafka.
+  kafka:
+    bootstrap-servers: 34.199.182.98:9092
+    consumer:
+      group-id: api-gateway
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          # uri: lb://user-service
+          # uri: https://etta-habitable-unwarrantedly.ngrok-free.dev
+          uri: http://34.199.182.98:8082
+          predicates:
+            - Path=/api/users/**
+        - id: monitoring-service
+          # uri: lb://monitoring-service
+          uri: https://etta-habitable-unwarrantedly.ngrok-free.dev
+          predicates:
+            - Path=/api/monitoring/**
+        # - id: patients-service chưa sửa tên bên nhóm bạn
+        #   uri: https://obumbrant-quenchlessly-julian.ngrok-free.dev
+        #   predicates:
+        #     - Path=/api/patients/**
+        - id: test-order-fake
+          uri: http://13.238.99.218:8089
+          predicates:
+            - Path=/api/test-orders/**
+        - id: warehouse-service
+          uri: https://unbearded-guardianless-ariella.ngrok-free.dev 
+          predicates:
+            - Path=/api/warehouse/**
+        # - id: iam-service
+        #   uri: lb://iam-service
+        #   predicates:
+        #     - Path=/api/users/**
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://23.23.152.34:8761/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
